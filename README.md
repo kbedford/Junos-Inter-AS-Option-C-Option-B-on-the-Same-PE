@@ -248,18 +248,70 @@ Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn St
 ```
 root@VMX3_re> show route receive-protocol bgp 10.0.23.2 detail 
 
+inet.0: 9 destinations, 9 routes (9 active, 0 holddown, 0 hidden)
+
 RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
-* 172.16.10.1/32 ... VPN Label: 300576 ... Communities: target:65000:100
-* 172.16.10.2/32 ... VPN Label: 300592 ... Communities: target:65000:100
+* 172.16.10.1/32 (1 entry, 1 announced)
+     Import Accepted
+     Route Distinguisher: 65002:100
+     VPN Label: 300576
+     Nexthop: 10.0.23.2
+     AS path: 65002 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+* 172.16.10.2/32 (1 entry, 1 announced)
+     Import Accepted
+     Route Distinguisher: 65002:100
+     VPN Label: 300592
+     Nexthop: 10.0.23.2
+     AS path: 65002 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
+
+mpls.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
+
+bgp.l3vpn.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
+
+* 65002:100:172.16.10.1/32 (1 entry, 0 announced)
+     Import Accepted
+     Route Distinguisher: 65002:100
+     VPN Label: 300576
+     Nexthop: 10.0.23.2
+     AS path: 65002 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+* 65002:100:172.16.10.2/32 (1 entry, 0 announced)
+     Import Accepted
+     Route Distinguisher: 65002:100
+     VPN Label: 300592
+     Nexthop: 10.0.23.2
+     AS path: 65002 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+inet6.0: 3 destinations, 3 routes (3 active, 0 holddown, 0 hidden)
+
+RED.inet6.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
 ```
 
 ```
 root@VMX3_re> show route table RED.inet.0 
 
 RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
-...
-172.16.10.1/32     *[BGP/170] ... >  to 10.0.23.2 via ge-0/0/2.0, Push 300576
-172.16.10.2/32     *[BGP/170] ... >  to 10.0.23.2 via ge-0/0/2.0, Push 300592
++ = Active Route, - = Last Active, * = Both
+
+172.16.10.1/32     *[BGP/170] 04:13:29, localpref 100
+                      AS path: 65002 65001 I, validation-state: unverified
+                    >  to 10.0.23.2 via ge-0/0/2.0, Push 300576
+172.16.10.2/32     *[BGP/170] 04:10:21, localpref 100
+                      AS path: 65002 65001 I, validation-state: unverified
+                    >  to 10.0.23.2 via ge-0/0/2.0, Push 300592
+172.16.30.1/32     *[Direct/0] 5d 05:12:50
+                    >  via lo0.100
+172.16.30.2/32     *[OSPF/10] 4d 05:55:02, metric 1
+                    >  to 10.0.3.2 via ge-0/0/1.0
+224.0.0.5/32       *[OSPF/10] 5d 05:12:51, metric 1
+                       MultiRecv
 ```
 
 ### vP3 — OSPF external routes learned
@@ -268,16 +320,79 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 root@vP3> show route table RED-vr.inet.0 
 
 RED-vr.inet.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
-...
-172.16.10.1/32     *[OSPF/150] ... >  to 10.0.3.1 via ge-0/0/2.0
-172.16.10.2/32     *[OSPF/150] ... >  to 10.0.3.1 via ge-0/0/2.0
++ = Active Route, - = Last Active, * = Both
+
+10.0.3.0/30        *[Direct/0] 4d 05:56:26
+                    >  via ge-0/0/2.0
+10.0.3.2/32        *[Local/0] 4d 05:56:26
+                       Local via ge-0/0/2.0
+172.16.10.1/32     *[OSPF/150] 04:14:08, metric 0, tag 3489725931
+                    >  to 10.0.3.1 via ge-0/0/2.0
+172.16.10.2/32     *[OSPF/150] 04:11:00, metric 0, tag 3489725931
+                    >  to 10.0.3.1 via ge-0/0/2.0
+172.16.30.2/32     *[Direct/0] 5d 05:07:33
+                    >  via lo0.100
+224.0.0.5/32       *[OSPF/10] 5d 05:07:33, metric 1
+                       MultiRecv
 ```
 
 ```
 root@vP3> show route protocol ospf detail 
-...
-172.16.10.1/32  *OSPF  Preference: 150 ... Tag: 3489725931
-172.16.10.2/32  *OSPF  Preference: 150 ... Tag: 3489725931
+
+inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
+
+RED-vr.inet.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
+172.16.10.1/32 (1 entry, 1 announced)
+        *OSPF   Preference: 150
+                Next hop type: Router, Next hop index: 588
+                Address: 0x70fec1c
+                Next-hop reference count: 4
+                Next hop: 10.0.3.1 via ge-0/0/2.0, selected
+                Session Id: 0x140
+                State: <Active Int Ext>
+                Age: 4:14:43    Metric: 0 
+                Validation State: unverified 
+                        Tag: 3489725931 
+                Task: RED-vr-OSPF
+                Announcement bits (1): 2-KRT 
+                AS path: I 
+                Thread: junos-main 
+
+172.16.10.2/32 (1 entry, 1 announced)
+        *OSPF   Preference: 150
+                Next hop type: Router, Next hop index: 588
+                Address: 0x70fec1c
+                Next-hop reference count: 4
+                Next hop: 10.0.3.1 via ge-0/0/2.0, selected
+                Session Id: 0x140
+                State: <Active Int Ext>
+                Age: 4:11:35    Metric: 0 
+                Validation State: unverified 
+                        Tag: 3489725931 
+                Task: RED-vr-OSPF
+                Announcement bits (1): 2-KRT 
+                AS path: I 
+                Thread: junos-main 
+
+224.0.0.5/32 (1 entry, 1 announced)
+        *OSPF   Preference: 10
+                Next hop type: MultiRecv, Next hop index: 0
+                Address: 0x70fe1f4
+                Next-hop reference count: 6
+                State: <Active NoReadvrt Int>
+                Age: 5d 5:08:08         Metric: 1 
+                Validation State: unverified 
+                Task: OSPF I/O./var/run/ppmd_control
+                Announcement bits (1): 2-KRT 
+                AS path: I 
+                Thread: junos-main 
+
+iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
+
+inet6.0: 3 destinations, 3 routes (3 active, 0 holddown, 0 hidden)
+
+RED-vr.inet6.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
+
 ```
 
 ```
@@ -298,6 +413,7 @@ traceroute to 172.16.10.1 (172.16.10.1) from 172.16.30.2, 30 hops max, 52 byte p
      MPLS Label=300112 CoS=0 TTL=1 S=1
  4  172.16.10.1 (172.16.10.1)  5.145 ms  5.408 ms  5.375 ms
 ```
+
 ### Lab Configuration 
 
 vP1
@@ -453,5 +569,5 @@ vP3
         set routing-instances RED-vr interface lo0.100
         set routing-options router-id 4.4.4.4   
   
-        
+### Final Thoughts     
 
