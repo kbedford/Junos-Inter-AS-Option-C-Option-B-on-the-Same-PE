@@ -129,7 +129,7 @@ root@VMX1_re> show route advertising-protocol bgp 10.0.12.2 detail
 RED.inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
 * 172.16.10.1/32 (1 entry, 1 announced)
  BGP group TO-VMX2 type External
-     Route Label: 300112
+     Route Label: 300112  <<<<
      Nexthop: Self
      Flags: Nexthop Change
      MED: 0
@@ -139,7 +139,7 @@ RED.inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
 
 * 172.16.10.2/32 (1 entry, 1 announced)
  BGP group TO-VMX2 type External
-     Route Label: 300112
+     Route Label: 300112 <<<<
      Nexthop: Self
      Flags: Nexthop Change
      MED: 0
@@ -178,7 +178,7 @@ inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
 RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 * 172.16.10.1/32 (1 entry, 1 announced)
      Accepted
-     Route Label: 300112
+     Route Label: 300112 <<<<
      Nexthop: 10.0.12.1
      MED: 0
      AS path: 65001 I 
@@ -187,7 +187,7 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 
 * 172.16.10.2/32 (1 entry, 1 announced)
      Accepted
-     Route Label: 300112
+     Route Label: 300112 <<<<
      Nexthop: 10.0.12.1
      MED: 0
      AS path: 65001 I 
@@ -571,3 +571,4 @@ vP3
   
 ### Final Thoughts     
 
+This lab proves that Junos can seamlessly blend Inter-AS Option C and Option B on the same PE to deliver true Carrier-of-Carrier L3VPN services—clean control-plane, deterministic labels/RTs, and verified end-to-end forwarding. The approach scales, offers multiple deployment flavours, and keeps operations simple with clear policy hooks for selective leaking and redistribution. In short: it’s a practical, production-ready pattern that lets providers interconnect AS domains with confidence while preserving flexibility for future migrations and growth.
