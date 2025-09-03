@@ -2,27 +2,17 @@
 
 This lab validates a hybrid Inter-AS design where a single Junos PE terminates Option C (BGP Labeled-Unicast) on one side and Option B (VPNv4) on the other.
 
-* [Flow Diagram (PNG)](sandbox:/mnt/data/optionC_optionB_flow.png)
-* [Topology Diagram (PNG)](sandbox:/mnt/data/optionC_optionB_topology.png)
+<img width="1367" height="472" alt="image" src="https://github.com/user-attachments/assets/1b0005ba-6705-46f8-9970-de72d3a13690" />
 
 ---
 
 # Junos Inter-AS Option C + Option B on the Same PE
 
-This lab validates a **hybrid Inter-AS design** where a single Junos PE terminates **Option C (BGP Labeled-Unicast)** on one side and **Option B (VPNv4)** on the other. The goal is to support **Carrier-of-Carrier VPNs**—one carrier transporting another carrier’s L3VPN routes across multiple AS domains—**with scale, flexibility, and operational clarity**.
+This lab validates a **hybrid Inter-AS design** where a single Junos PE terminates **Option C (BGP Labeled-Unicast)** on one side and **Option B (VPNv4)** on the other. The goal is to support **Carrier-of-Carrier VPNs** one carrier transporting another carrier’s L3VPN routes across multiple AS domains **with scale, flexibility, and operational clarity**.
 
 **Device Under Test (DUT):** `vMX2 (AS65002)`
-
 * **Upstream:** `vMX1 (AS65001)` via **Option C (LU)**
 * **Downstream:** `vMX3 (AS65003)` via **Option B (VPNv4)**
-
----
-
-## Topology
-
-![Flow Diagram](sandbox:/mnt/data/optionC_optionB_flow.png)
-
-![Topology Diagram](sandbox:/mnt/data/optionC_optionB_topology.png)
 
 ---
 
@@ -310,6 +300,26 @@ traceroute to 172.16.10.1 (172.16.10.1) from 172.16.30.2, 30 hops max, 52 byte p
      MPLS Label=300112 CoS=0 TTL=1 S=1
  4  172.16.10.1 (172.16.10.1)  5.145 ms  5.408 ms  5.375 ms
 ```
+### Lab Configuration 
 
+vP1
+        root@vP1> show configuration | display set | except "groups global | apply-groups | groups member0" 
+        set version 21.2R3-S2.9
+        set system host-name vP1
+        set system ports console log-out-on-disconnect
+        set interfaces ge-0/0/1 unit 0 family inet address 10.0.1.2/30
+        set interfaces ge-0/0/2 unit 0 family inet address 172.16.10.2/32
+        set interfaces lo0 unit 100 family inet address 172.16.10.1/32
+        set policy-options policy-statement EXP term LOCAL from interface lo0.100
+        set policy-options policy-statement EXP term LOCAL from interface ge-0/0/2.0
+        set policy-options policy-statement EXP term LOCAL then accept
+        set routing-instances RED instance-type vrf
+        set routing-instances RED protocols ospf area 0.0.0.0 interface ge-0/0/1.0
+        set routing-instances RED protocols ospf export EXP
+        set routing-instances RED interface ge-0/0/1.0
+        set routing-instances RED interface ge-0/0/2.0
+        set routing-instances RED interface lo0.100
+        set routing-instances RED route-distinguisher 65001:100
+        set routing-instances RED vrf-target target:65000:100
+        set routing-options router-id 5.5.5.5
 
-If you want this as a **repo bundle** (README + PNGs), I can package the files so you can upload them directly.
