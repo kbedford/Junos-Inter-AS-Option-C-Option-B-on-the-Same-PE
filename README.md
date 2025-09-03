@@ -6,8 +6,6 @@ This lab validates a hybrid Inter-AS design where a single Junos PE terminates O
 
 ---
 
-# Junos Inter-AS Option C + Option B on the Same PE
-
 This lab validates a **hybrid Inter-AS design** where a single Junos PE terminates **Option C (BGP Labeled-Unicast)** on one side and **Option B (VPNv4)** on the other. The goal is to support **Carrier-of-Carrier VPNs** one carrier transporting another carrier’s L3VPN routes across multiple AS domains **with scale, flexibility, and operational clarity**.
 
 **Device Under Test (DUT):** `vMX2 (AS65002)`
@@ -303,6 +301,7 @@ traceroute to 172.16.10.1 (172.16.10.1) from 172.16.30.2, 30 hops max, 52 byte p
 ### Lab Configuration 
 
 vP1
+
         root@vP1> show configuration | display set | except "groups global | apply-groups | groups member0" 
         set version 21.2R3-S2.9
         set system host-name vP1
@@ -322,4 +321,137 @@ vP1
         set routing-instances RED route-distinguisher 65001:100
         set routing-instances RED vrf-target target:65000:100
         set routing-options router-id 5.5.5.5
+vMX1
+
+        root@VMX1_re> show configuration | display set | except "groups global | apply-groups | groups member0" 
+        set version 21.2R3-S2.9
+        set system ports console log-out-on-disconnect
+        set interfaces ge-0/0/1 unit 0 family inet address 10.0.12.1/30
+        set interfaces ge-0/0/1 unit 0 family mpls
+        set interfaces ge-0/0/2 unit 0 family inet address 10.0.1.1/30
+        set interfaces lo0 unit 0 family inet address 1.1.1.1/32
+        set policy-options policy-statement INET0_CE_ROUTE_LEAKING term OSPF from protocol ospf
+        set policy-options policy-statement INET0_CE_ROUTE_LEAKING term OSPF from route-filter 172.16.10.1/32 exact
+        set policy-options policy-statement INET0_CE_ROUTE_LEAKING term OSPF from route-filter 172.16.10.2/32 exact
+        set policy-options policy-statement INET0_CE_ROUTE_LEAKING term OSPF then accept
+        set policy-options policy-statement INET0_CE_ROUTE_LEAKING term LAST then reject
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 from protocol bgp
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 then external type 2
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 then accept
+        set policy-options policy-statement RED-TO-GLOBAL term t1 from rib RED.inet.0
+        set policy-options policy-statement RED-TO-GLOBAL term t1 then accept
+        set policy-options community LU-RED members target:65100:100
+        set routing-instances RED instance-type vrf
+        set routing-instances RED routing-options autonomous-system 65001
+        set routing-instances RED protocols bgp group TO-VMX2 type external
+        set routing-instances RED protocols bgp group TO-VMX2 neighbor 10.0.12.2 family inet labeled-unicast
+        set routing-instances RED protocols bgp group TO-VMX2 neighbor 10.0.12.2 export INET0_CE_ROUTE_LEAKING
+        set routing-instances RED protocols bgp group TO-VMX2 neighbor 10.0.12.2 peer-as 65002
+        set routing-instances RED protocols ospf area 0.0.0.0 interface ge-0/0/2.0
+        set routing-instances RED protocols ospf export RED-BGP-TO-OSPF
+        set routing-instances RED interface ge-0/0/1.0
+        set routing-instances RED interface ge-0/0/2.0
+        set routing-instances RED route-distinguisher 65001:100
+        set routing-instances RED vrf-target target:65000:100
+        set routing-options router-id 1.1.1.1
+        set routing-options autonomous-system 65001
+        set protocols mpls interface all
+
+  vMX2 - DUT
+
+        root@VMX2_re> show configuration | display set | except "groups global | apply-groups | groups member0" 
+        set version 21.2R3-S2.9
+        set system ports console log-out-on-disconnect
+        set interfaces ge-0/0/1 unit 0 family inet address 10.0.12.2/30
+        set interfaces ge-0/0/1 unit 0 family mpls
+        set interfaces ge-0/0/2 unit 0 family inet address 10.0.23.2/30
+        set interfaces ge-0/0/2 unit 0 family mpls
+        set interfaces lo0 unit 0 family inet address 2.2.2.2/32
+        set interfaces lo0 unit 100 family inet
+        set policy-options policy-statement EXPORT-RED-BGP term 1 from instance RED
+        set policy-options policy-statement EXPORT-RED-BGP term 1 then accept
+        set policy-options policy-statement EXPORT-RED-LU-OUT term t1 from rib RED.inet.0
+        set policy-options policy-statement EXPORT-RED-LU-OUT term t1 then community add LU-RED
+        set policy-options policy-statement EXPORT-RED-LU-OUT term t1 then accept
+        set policy-options policy-statement EXPORT-RED-VPNV4 term t1 from instance RED
+        set policy-options policy-statement EXPORT-RED-VPNV4 term t1 then accept
+        set policy-options policy-statement EXPORT-TO-VMX3 term 1 from instance RED
+        set policy-options policy-statement EXPORT-TO-VMX3 term 1 then accept
+        set policy-options policy-statement IMPORT-LU-RED term t1 from community LU-RED
+        set policy-options policy-statement IMPORT-LU-RED term t1 from community RED-COM
+        set policy-options policy-statement IMPORT-LU-RED term t1 then community delete ALL
+        set policy-options policy-statement IMPORT-LU-RED term t1 then accept
+        set policy-options policy-statement IMPORT-LU-RED then reject
+        set policy-options policy-statement MATCH-LU-RED term t1 from community LU-RED
+        set policy-options policy-statement MATCH-LU-RED term t1 then accept
+        set policy-options policy-statement MATCH-LU-RED then reject
+        set policy-options policy-statement RED-TO-GLOBAL term t1 from rib RED.inet.0
+        set policy-options policy-statement RED-TO-GLOBAL term t1 then accept
+        set policy-options community ALL members *:*
+        set policy-options community LU-RED members target:65100:100
+        set policy-options community RED-COM members target:65000:100
+        set routing-instances RED instance-type vrf
+        set routing-instances RED routing-options auto-export
+        set routing-instances RED protocols bgp group TO-VMX1-LU type external
+        set routing-instances RED protocols bgp group TO-VMX1-LU neighbor 10.0.12.1 family inet labeled-unicast
+        set routing-instances RED protocols bgp group TO-VMX1-LU neighbor 10.0.12.1 peer-as 65001
+        set routing-instances RED interface ge-0/0/1.0
+        set routing-instances RED interface lo0.100
+        set routing-instances RED route-distinguisher 65002:100
+        set routing-instances RED vrf-import IMPORT-LU-RED
+        set routing-instances RED vrf-target target:65000:100
+        set routing-options router-id 2.2.2.2
+        set routing-options autonomous-system 65002
+        set routing-options instance-import RED-TO-GLOBAL
+        set routing-options auto-export
+        set protocols bgp group TO-VMX3-BGP type external
+        set protocols bgp group TO-VMX3-BGP peer-as 65003
+        set protocols bgp group TO-VMX3-BGP neighbor 10.0.23.1 family inet-vpn unicast
+        set protocols mpls explicit-null
+        set protocols mpls label-switched-path LSP-VMX2-to-VMX1 to 1.1.1.1
+        set protocols mpls path path1 10.0.12.1 loose
+        set protocols mpls interface all
+
+  vMX3
+
+        root@VMX3_re> show configuration | display set | except "groups global | apply-groups | groups member0" 
+        set version 21.2R3-S2.9
+        set system ports console log-out-on-disconnect
+        set interfaces ge-0/0/1 unit 0 family inet address 10.0.3.1/30
+        set interfaces ge-0/0/2 unit 0 family inet address 10.0.23.1/30
+        set interfaces ge-0/0/2 unit 0 family mpls
+        set interfaces lo0 unit 100 family inet address 172.16.30.1/32
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 from protocol bgp
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 then external type 2
+        set policy-options policy-statement RED-BGP-TO-OSPF term t1 then accept
+        set routing-instances RED instance-type vrf
+        set routing-instances RED protocols ospf area 0.0.0.0 interface ge-0/0/1.0
+        set routing-instances RED protocols ospf export RED-BGP-TO-OSPF
+        set routing-instances RED interface ge-0/0/1.0
+        set routing-instances RED interface lo0.100
+        set routing-instances RED route-distinguisher 65003:100
+        set routing-instances RED vrf-target target:65000:100
+        set routing-options router-id 3.3.3.3
+        set routing-options autonomous-system 65003
+        set protocols bgp group TO-VMX2-BGP type external
+        set protocols bgp group TO-VMX2-BGP peer-as 65002
+        set protocols bgp group TO-VMX2-BGP neighbor 10.0.23.2 family inet-vpn unicast
+        set protocols mpls interface ge-0/0/2.0
+
+vP3
+
+        root@vP3> show configuration | display set | except "groups global | apply-groups | groups member0" 
+        set version 21.2R3-S2.9
+        set system host-name vP3
+        set system ports console log-out-on-disconnect
+        set interfaces ge-0/0/2 unit 0 family inet address 10.0.3.2/30
+        set interfaces lo0 unit 100 family inet address 172.16.30.2/32
+        set routing-instances RED-vr instance-type virtual-router
+        set routing-instances RED-vr protocols ospf area 0.0.0.0 interface ge-0/0/2.0
+        set routing-instances RED-vr protocols ospf area 0.0.0.0 interface lo0.100 passive
+        set routing-instances RED-vr interface ge-0/0/2.0
+        set routing-instances RED-vr interface lo0.100
+        set routing-options router-id 4.4.4.4   
+  
+        
 
