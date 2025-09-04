@@ -571,7 +571,7 @@ vP3
   
 ### Final Thoughts     
 
-This lab proves that Junos can seamlessly blend Inter-AS Option C and Option B on the same PE to deliver true Carrier-of-Carrier L3VPN services—clean control-plane, deterministic labels/RTs, and verified end-to-end forwarding. The approach scales, offers multiple deployment flavours, and keeps operations simple with clear policy hooks for selective leaking and redistribution. In short: it’s a practical, production-ready pattern that lets providers interconnect AS domains with confidence while preserving flexibility for future migrations and growth.
+This lab demonstrates that Junos can seamlessly integrate Inter-AS Option C and Option B on the same PE to deliver true Carrier-of-Carrier L3VPN services, featuring a clean control plane, deterministic labels/RTs, and verified end-to-end forwarding. The approach scales, offers multiple deployment flavours, and keeps operations simple with clear policy hooks for selective leaking and redistribution. In short, it’s a practical, production ready pattern that lets providers interconnect AS domains with confidence while preserving flexibility for future migrations and growth.
 
 📚 References
 
