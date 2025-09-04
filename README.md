@@ -575,6 +575,6 @@ This lab demonstrates that Junos can seamlessly integrate Inter-AS Option C and 
 
 📚 References
 
-  RFC 4364: BGP/MPLS IP Virtual Private Networks (VPNs)
-  RFC 4365: Applicability Statement for BGP/MPLS IP VPNs
-  RFC 3107: Carrying Label Information in BGP-4
+  * RFC 4364: BGP/MPLS IP Virtual Private Networks (VPNs)
+  * RFC 4365: Applicability Statement for BGP/MPLS IP VPNs
+  * RFC 3107: Carrying Label Information in BGP-4
