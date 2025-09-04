@@ -210,7 +210,7 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 * 172.16.10.1/32 (1 entry, 1 announced)
  BGP group TO-VMX3-BGP type External
      Route Distinguisher: 65002:100
-     VPN Label: 300576
+     VPN Label: 300576 <<<<
      Nexthop: Self
      Flags: Nexthop Change
      AS path: [65002] 65001 I 
@@ -219,7 +219,7 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 * 172.16.10.2/32 (1 entry, 1 announced)
  BGP group TO-VMX3-BGP type External
      Route Distinguisher: 65002:100
-     VPN Label: 300592
+     VPN Label: 300592 <<<<
      Nexthop: Self
      Flags: Nexthop Change
      AS path: [65002] 65001 I 
@@ -330,7 +330,7 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 * 172.16.10.1/32 (1 entry, 1 announced)
      Import Accepted
      Route Distinguisher: 65002:100
-     VPN Label: 300576
+     VPN Label: 300576 <<<< 
      Nexthop: 10.0.23.2
      AS path: 65002 65001 I 
      Communities: target:65000:100 rte-type:0.0.0.0:5:1
@@ -338,7 +338,7 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
 * 172.16.10.2/32 (1 entry, 1 announced)
      Import Accepted
      Route Distinguisher: 65002:100
-     VPN Label: 300592
+     VPN Label: 300592 <<<<
      Nexthop: 10.0.23.2
      AS path: 65002 65001 I 
      Communities: target:65000:100 rte-type:0.0.0.0:5:1
@@ -352,7 +352,7 @@ bgp.l3vpn.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
 * 65002:100:172.16.10.1/32 (1 entry, 0 announced)
      Import Accepted
      Route Distinguisher: 65002:100
-     VPN Label: 300576
+     VPN Label: 300576 <<<<
      Nexthop: 10.0.23.2
      AS path: 65002 65001 I 
      Communities: target:65000:100 rte-type:0.0.0.0:5:1
@@ -360,7 +360,7 @@ bgp.l3vpn.0: 6 destinations, 6 routes (6 active, 0 holddown, 0 hidden)
 * 65002:100:172.16.10.2/32 (1 entry, 0 announced)
      Import Accepted
      Route Distinguisher: 65002:100
-     VPN Label: 300592
+     VPN Label: 300592 <<<<
      Nexthop: 10.0.23.2
      AS path: 65002 65001 I 
      Communities: target:65000:100 rte-type:0.0.0.0:5:1
