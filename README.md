@@ -194,6 +194,82 @@ RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
      Communities: rte-type:0.0.0.0:5:1
      Entropy label capable, next hop field matches route next hop
 ```
+```
+root@VMX2_re> show route advertising-protocol bgp 10.0.23.1 detail 
+
+RED.inet.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
+* 10.0.12.0/30 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     BGP label allocation failure: Need a nexthop address on LAN
+     Nexthop: Not advertised
+     Flags: Nexthop Change
+     AS path: [65002] I 
+     Communities: target:65000:100
+
+* 172.16.10.1/32 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     VPN Label: 300576
+     Nexthop: Self
+     Flags: Nexthop Change
+     AS path: [65002] 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+* 172.16.10.2/32 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     VPN Label: 300592
+     Nexthop: Self
+     Flags: Nexthop Change
+     AS path: [65002] 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+bgp.l3vpn.0: 7 destinations, 7 routes (7 active, 0 holddown, 0 hidden)
+
+* 65002:100:10.0.12.0/30 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     BGP label allocation failure: Need a nexthop address on LAN
+     Nexthop: Not advertised
+     Flags: Nexthop Change
+     AS path: [65002] I 
+     Communities: target:65000:100
+
+* 65002:100:172.16.10.1/32 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     VPN Label: 300576
+     Nexthop: Self
+     Flags: Nexthop Change
+     AS path: [65002] 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+* 65002:100:172.16.10.2/32 (1 entry, 1 announced)
+ BGP group TO-VMX3-BGP type External
+     Route Distinguisher: 65002:100
+     VPN Label: 300592
+     Nexthop: Self
+     Flags: Nexthop Change
+     AS path: [65002] 65001 I 
+     Communities: target:65000:100 rte-type:0.0.0.0:5:1
+
+
+```
+Customer prefixes (172.16.10.1/32 and 172.16.10.2/32)
+
+   * These are the actual customer VRF routes originated in vP1 → vMX1 (AS65001).
+  
+   * vMX2 re-advertises them as VPNv4 routes toward vMX3.
+  
+   * It assigns per-prefix VPN labels (300576 and 300592).
+  
+   * Nexthop: Self means vMX2 sets itself as the next hop for vMX3.
+  
+   * RT target:65000:100 ensures they import into the correct VRF (RED) on vMX3.
+  
+   * AS path shows [65002] 65001 I → the route came from AS65001, passed through AS65002, and is now going to AS65003.
+
 
 ```
 root@VMX2_re> show route table bgp.l3vpn.0 
