@@ -657,4 +657,4 @@ This lab demonstrates that Junos can seamlessly integrate Inter-AS Option C and 
 
 🙌 Credits
 
-Special Thanks to Antonio Quisillo for the guidance and review. 
+Special Thanks to Antonio Quisillo ( https://github.com/entoni-gnagno) for the guidance and review. 
